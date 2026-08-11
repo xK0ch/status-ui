@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Server Status | Fynn Koch</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" id="favicon" type="image/x-icon" href="/favicon-online.ico" />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
@@ -17,11 +17,11 @@
       <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> fynn-koch.de
     </a>
     <h1>Server Status</h1>
-    <p class="tagline">Live-Status der Homelab-Server von MLTSF.</p>
+    <p class="tagline">Live status of Fynn Koch's game servers.</p>
     <div class="status-bar">
       <span class="conn" id="conn" data-state="connecting">
         <span class="conn-dot" aria-hidden="true"></span>
-        <span class="conn-label" id="conn-label">Verbinde&hellip;</span>
+        <span class="conn-label" id="conn-label">Connecting&hellip;</span>
       </span>
     </div>
   </header>
@@ -29,7 +29,7 @@
   <!-- SERVER GRID -->
   <section class="section">
     <div class="projects" id="servers" aria-live="polite">
-      <p class="empty" id="empty">Lade Serverstatus&hellip;</p>
+      <p class="empty" id="empty">Loading server status&hellip;</p>
     </div>
   </section>
 

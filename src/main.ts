@@ -17,12 +17,24 @@ const grid = document.querySelector<HTMLElement>('#servers')!;
 const emptyHint = document.querySelector<HTMLElement>('#empty');
 const conn = document.querySelector<HTMLElement>('#conn')!;
 const connLabel = document.querySelector<HTMLElement>('#conn-label')!;
+const favicon = document.querySelector<HTMLLinkElement>('#favicon')!;
 
 const CONNECTION_LABELS: Record<ConnectionState, string> = {
-  connecting: 'Verbinde…',
+  connecting: 'Connecting…',
   live: 'Live',
-  reconnecting: 'Verbindung unterbrochen…',
+  reconnecting: 'Reconnecting…',
 };
+
+// The tab icon is green while at least one server is online, red otherwise.
+function updateFavicon(servers: ServerStatus[]): void {
+  const anyOnline = servers.some((server) => server.online);
+  favicon.href = anyOnline ? '/favicon-online.ico' : '/favicon-offline.ico';
+}
+
+// Server-provided names carry the "MLTSF" brand; show "Fynn Koch" instead.
+function rebrand(text: string): string {
+  return text.split('MLTSF').join('Fynn Koch');
+}
 
 // Keep the latest snapshot so the "updated N seconds ago" labels can tick
 // independently of incoming data.
@@ -32,6 +44,7 @@ connectStatus({
   onData: (servers) => {
     latest = servers;
     render(servers);
+    updateFavicon(servers);
   },
   onConnection: (state) => {
     conn.dataset.state = state;
@@ -51,7 +64,7 @@ function render(servers: ServerStatus[]): void {
   emptyHint?.remove();
 
   if (servers.length === 0) {
-    grid.innerHTML = '<p class="empty">Keine Server konfiguriert.</p>';
+    grid.innerHTML = '<p class="empty">No servers configured.</p>';
     return;
   }
 
@@ -70,7 +83,7 @@ function renderCard(server: ServerStatus): HTMLElement {
   main.appendChild(renderHead(server));
   main.appendChild(renderMeta(server));
 
-  const detail = server.online ? server.motd : server.error;
+  const detail = server.online ? (server.motd ? rebrand(server.motd) : null) : server.error;
   if (detail) {
     const line = document.createElement('p');
     line.className = server.online ? 'status-motd' : 'status-error';
@@ -115,12 +128,12 @@ function renderMeta(server: ServerStatus): HTMLElement {
   if (server.online) {
     if (server.players !== null) {
       const max = server.maxPlayers !== null ? ` / ${server.maxPlayers}` : '';
-      meta.appendChild(metaItem('users', 'Spieler', `${server.players}${max}`));
+      meta.appendChild(metaItem('users', 'Players', `${server.players}${max}`));
     } else if (server.maxPlayers !== null) {
       meta.appendChild(metaItem('users', 'Slots', String(server.maxPlayers)));
     }
     if (server.version) meta.appendChild(metaItem('tag', 'Version', server.version));
-    if (server.map) meta.appendChild(metaItem('map', 'Karte', server.map));
+    if (server.map) meta.appendChild(metaItem('map', 'Map', server.map));
     if (server.latencyMs !== null) {
       meta.appendChild(metaItem('gauge-high', 'Ping', `${server.latencyMs} ms`));
     }
@@ -130,7 +143,7 @@ function renderMeta(server: ServerStatus): HTMLElement {
     const item = document.createElement('div');
     const value = document.createElement('dd');
     value.className = 'status-dim';
-    value.textContent = server.online ? 'Erreichbar' : 'Nicht erreichbar';
+    value.textContent = server.online ? 'Reachable' : 'Unreachable';
     item.appendChild(value);
     meta.appendChild(item);
   }
@@ -156,10 +169,10 @@ function metaItem(icon: string, label: string, value: string): HTMLElement {
 
 function formatAgo(iso: string): string {
   const seconds = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
-  if (seconds < 5) return 'gerade eben';
-  if (seconds < 60) return `vor ${seconds} s`;
+  if (seconds < 5) return 'just now';
+  if (seconds < 60) return `${seconds} s ago`;
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `vor ${minutes} min`;
+  if (minutes < 60) return `${minutes} min ago`;
   const hours = Math.round(minutes / 60);
-  return `vor ${hours} h`;
+  return `${hours} h ago`;
 }
