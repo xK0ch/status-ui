@@ -48,11 +48,6 @@ function updateFavicon(servers: ServerStatus[]): void {
   favicon.href = anyDown ? '/favicon-offline.ico' : '/favicon-online.ico';
 }
 
-// Server-provided names carry the "MLTSF" brand; show "Fynn Koch" instead.
-function rebrand(text: string): string {
-  return text.split('MLTSF').join('Fynn Koch');
-}
-
 // Keep the latest snapshot so the "updated N seconds ago" labels can tick
 // independently of incoming data.
 let latest: ServerStatus[] = [];
@@ -142,7 +137,7 @@ function renderDetail(server: ServerStatus, state: CardState): HTMLElement | nul
   let className: string;
   switch (state) {
     case 'online':
-      text = server.motd ? rebrand(server.motd) : null;
+      text = server.motd;
       className = 'status-motd';
       break;
     case 'down':
