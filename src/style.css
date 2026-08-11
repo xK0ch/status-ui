@@ -475,8 +475,12 @@ footer {
 .status-card[data-state='online'] {
   border-left-color: #22c55e;
 }
-.status-card[data-state='offline'] {
+.status-card[data-state='down'] {
   border-left-color: #ef4444;
+}
+.status-card[data-state='idle'] {
+  border-left-color: #3a4353;
+  opacity: 0.72;
 }
 
 /* Per-server accent tint for the name dot */
@@ -508,8 +512,11 @@ footer {
   background: var(--accent, #22c55e);
   box-shadow: 0 0 8px 0 var(--accent, #22c55e);
 }
-.status-card[data-state='offline'] .status-dot {
+.status-card[data-state='down'] .status-dot {
   background: #ef4444;
+}
+.status-card[data-state='idle'] .status-dot {
+  background: #64748b;
 }
 .status-state {
   font-size: 0.7rem;
@@ -523,9 +530,13 @@ footer {
   color: #bbf7d0;
   background: rgba(34, 197, 94, 0.12);
 }
-.status-card[data-state='offline'] .status-state {
+.status-card[data-state='down'] .status-state {
   color: #fecaca;
   background: rgba(239, 68, 68, 0.12);
+}
+.status-card[data-state='idle'] .status-state {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.12);
 }
 
 /* Meta grid */
@@ -580,6 +591,11 @@ footer {
   color: #f87171;
   line-height: 1.4;
   word-break: break-word;
+}
+.status-idle {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.4;
 }
 
 .status-footer {

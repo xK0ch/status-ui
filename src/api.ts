@@ -7,6 +7,7 @@ export interface ServerStatus {
   name: string;
   game: GameType;
   online: boolean;
+  expectedOnline: boolean;
   players: number | null;
   maxPlayers: number | null;
   version: string | null;

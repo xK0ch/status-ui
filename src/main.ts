@@ -25,10 +25,27 @@ const CONNECTION_LABELS: Record<ConnectionState, string> = {
   reconnecting: 'Reconnecting…',
 };
 
-// The tab icon is green while at least one server is online, red otherwise.
+// Three display states:
+//   online - reachable right now
+//   down   - meant to be online but not reachable (a real problem)
+//   idle   - intentionally not running
+type CardState = 'online' | 'down' | 'idle';
+
+const STATE_LABELS: Record<CardState, string> = {
+  online: 'Online',
+  down: 'Down',
+  idle: 'Offline',
+};
+
+function cardState(server: ServerStatus): CardState {
+  if (server.online) return 'online';
+  return server.expectedOnline ? 'down' : 'idle';
+}
+
+// The tab icon turns red only when a server that should be online is down.
 function updateFavicon(servers: ServerStatus[]): void {
-  const anyOnline = servers.some((server) => server.online);
-  favicon.href = anyOnline ? '/favicon-online.ico' : '/favicon-offline.ico';
+  const anyDown = servers.some((server) => cardState(server) === 'down');
+  favicon.href = anyDown ? '/favicon-offline.ico' : '/favicon-online.ico';
 }
 
 // Server-provided names carry the "MLTSF" brand; show "Fynn Koch" instead.
@@ -72,24 +89,21 @@ function render(servers: ServerStatus[]): void {
 }
 
 function renderCard(server: ServerStatus): HTMLElement {
+  const state = cardState(server);
+
   const card = document.createElement('article');
   card.className = 'card status-card';
   card.dataset.server = server.id;
-  card.dataset.state = server.online ? 'online' : 'offline';
+  card.dataset.state = state;
 
   const main = document.createElement('div');
   main.className = 'card-main';
 
-  main.appendChild(renderHead(server));
-  main.appendChild(renderMeta(server));
+  main.appendChild(renderHead(server, state));
+  if (server.online) main.appendChild(renderMeta(server));
 
-  const detail = server.online ? (server.motd ? rebrand(server.motd) : null) : server.error;
-  if (detail) {
-    const line = document.createElement('p');
-    line.className = server.online ? 'status-motd' : 'status-error';
-    line.textContent = detail;
-    main.appendChild(line);
-  }
+  const detail = renderDetail(server, state);
+  if (detail) main.appendChild(detail);
 
   const footer = document.createElement('div');
   footer.className = 'card-links status-footer';
@@ -103,7 +117,7 @@ function renderCard(server: ServerStatus): HTMLElement {
   return card;
 }
 
-function renderHead(server: ServerStatus): HTMLElement {
+function renderHead(server: ServerStatus, state: CardState): HTMLElement {
   const head = document.createElement('div');
   head.className = 'status-head';
 
@@ -113,37 +127,63 @@ function renderHead(server: ServerStatus): HTMLElement {
   const name = document.createElement('h3');
   name.textContent = server.name;
 
-  const state = document.createElement('span');
-  state.className = 'status-state';
-  state.textContent = server.online ? 'Online' : 'Offline';
+  const pill = document.createElement('span');
+  pill.className = 'status-state';
+  pill.textContent = STATE_LABELS[state];
 
-  head.append(dot, name, state);
+  head.append(dot, name, pill);
   return head;
 }
 
+// The detail line under the meta grid: server name when online, the technical
+// error only for a real outage, and a calm note for intentionally-off servers.
+function renderDetail(server: ServerStatus, state: CardState): HTMLElement | null {
+  let text: string | null;
+  let className: string;
+  switch (state) {
+    case 'online':
+      text = server.motd ? rebrand(server.motd) : null;
+      className = 'status-motd';
+      break;
+    case 'down':
+      text = server.error;
+      className = 'status-error';
+      break;
+    case 'idle':
+      text = 'Not currently running';
+      className = 'status-idle';
+      break;
+  }
+
+  if (!text) return null;
+  const line = document.createElement('p');
+  line.className = className;
+  line.textContent = text;
+  return line;
+}
+
+// Only called for online servers; renders whatever metrics the protocol reports.
 function renderMeta(server: ServerStatus): HTMLElement {
   const meta = document.createElement('dl');
   meta.className = 'status-meta';
 
-  if (server.online) {
-    if (server.players !== null) {
-      const max = server.maxPlayers !== null ? ` / ${server.maxPlayers}` : '';
-      meta.appendChild(metaItem('users', 'Players', `${server.players}${max}`));
-    } else if (server.maxPlayers !== null) {
-      meta.appendChild(metaItem('users', 'Slots', String(server.maxPlayers)));
-    }
-    if (server.version) meta.appendChild(metaItem('tag', 'Version', server.version));
-    if (server.map) meta.appendChild(metaItem('map', 'Map', server.map));
-    if (server.latencyMs !== null) {
-      meta.appendChild(metaItem('gauge-high', 'Ping', `${server.latencyMs} ms`));
-    }
+  if (server.players !== null) {
+    const max = server.maxPlayers !== null ? ` / ${server.maxPlayers}` : '';
+    meta.appendChild(metaItem('users', 'Players', `${server.players}${max}`));
+  } else if (server.maxPlayers !== null) {
+    meta.appendChild(metaItem('users', 'Slots', String(server.maxPlayers)));
+  }
+  if (server.version) meta.appendChild(metaItem('tag', 'Version', server.version));
+  if (server.map) meta.appendChild(metaItem('map', 'Map', server.map));
+  if (server.latencyMs !== null) {
+    meta.appendChild(metaItem('gauge-high', 'Ping', `${server.latencyMs} ms`));
   }
 
   if (meta.childElementCount === 0) {
     const item = document.createElement('div');
     const value = document.createElement('dd');
     value.className = 'status-dim';
-    value.textContent = server.online ? 'Reachable' : 'Unreachable';
+    value.textContent = 'Reachable';
     item.appendChild(value);
     meta.appendChild(item);
   }
