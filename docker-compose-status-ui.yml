@@ -1,0 +1,16 @@
+services:
+  status-ui:
+    build: .
+    container_name: status-ui
+    networks:
+      - proxy-net
+      - status-net
+    restart: unless-stopped
+
+networks:
+  proxy-net:
+    name: proxy-net
+    external: true
+  status-net:
+    name: status-net
+    external: true

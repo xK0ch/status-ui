@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Server Status | Fynn Koch</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+
+<main>
+
+  <!-- HEADER -->
+  <header class="status-header">
+    <a class="back-link" href="https://fynn-koch.de">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> fynn-koch.de
+    </a>
+    <h1>Server Status</h1>
+    <p class="tagline">Live-Status der Homelab-Server von MLTSF.</p>
+    <div class="status-bar">
+      <span class="conn" id="conn" data-state="connecting">
+        <span class="conn-dot" aria-hidden="true"></span>
+        <span class="conn-label" id="conn-label">Verbinde&hellip;</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- SERVER GRID -->
+  <section class="section">
+    <div class="projects" id="servers" aria-live="polite">
+      <p class="empty" id="empty">Lade Serverstatus&hellip;</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 Fynn Koch</p>
+</footer>
+
+<script type="module" src="/src/main.ts"></script>
+
+</body>
+</html>
