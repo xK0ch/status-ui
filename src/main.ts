@@ -116,9 +116,6 @@ function renderHead(server: ServerStatus, state: CardState): HTMLElement {
   const head = document.createElement('div');
   head.className = 'status-head';
 
-  const dot = document.createElement('span');
-  dot.className = 'status-dot';
-
   const name = document.createElement('h3');
   name.textContent = server.name;
 
@@ -126,7 +123,7 @@ function renderHead(server: ServerStatus, state: CardState): HTMLElement {
   pill.className = 'status-state';
   pill.textContent = STATE_LABELS[state];
 
-  head.append(dot, name, pill);
+  head.append(name, pill);
   return head;
 }
 

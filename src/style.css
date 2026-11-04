@@ -483,13 +483,6 @@ footer {
   opacity: 0.72;
 }
 
-/* Per-server accent tint for the name dot */
-.status-card[data-server='minecraft']  { --accent: #5b9d3f; }
-.status-card[data-server='palworld']   { --accent: #3aa0ff; }
-.status-card[data-server='enshrouded'] { --accent: #c07be0; }
-.status-card[data-server='project-zomboid'] { --accent: #c0392b; }
-.status-card[data-server='teamspeak']  { --accent: #2580c3; }
-
 .status-head {
   display: flex;
   align-items: center;
@@ -501,23 +494,6 @@ footer {
   color: #f1f5f9;
   margin: 0;
   flex: 1;
-}
-.status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: #64748b;
-}
-.status-card[data-state='online'] .status-dot {
-  background: var(--accent, #22c55e);
-  box-shadow: 0 0 8px 0 var(--accent, #22c55e);
-}
-.status-card[data-state='down'] .status-dot {
-  background: #ef4444;
-}
-.status-card[data-state='idle'] .status-dot {
-  background: #64748b;
 }
 .status-state {
   font-size: 0.7rem;
