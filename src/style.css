@@ -487,6 +487,7 @@ footer {
 .status-card[data-server='minecraft']  { --accent: #5b9d3f; }
 .status-card[data-server='palworld']   { --accent: #3aa0ff; }
 .status-card[data-server='enshrouded'] { --accent: #c07be0; }
+.status-card[data-server='project-zomboid'] { --accent: #c0392b; }
 .status-card[data-server='teamspeak']  { --accent: #2580c3; }
 
 .status-head {
